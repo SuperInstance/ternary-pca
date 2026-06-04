@@ -87,6 +87,18 @@ println!("Cumulative (k=2): {:.4}", pca.cumulative_variance(2));
 3. **Feature extraction from ternary signals** — Find the principal directions in thresholded measurement data
 4. **Anomaly detection** — High reconstruction error after PCA projection indicates outliers
 
+## Known Limitations
+
+- **Fixed-point precision loss with 8.8 format**: The Q8.8 fixed-point format (SCALE=256) provides only ~2 decimal digits of precision. Variance values below `1/256 ≈ 0.004` round to zero, and eigenvalues for weakly correlated ternary data may be lost entirely. This is especially problematic for high-dimensional data where per-dimension variance is small.
+
+- **Power iteration may converge slowly or not at all**: `EigenDecomp::compute()` runs a fixed 100 iterations of power iteration per component. For matrices with close eigenvalues (common in ternary data with only three distinct values), convergence can require many more iterations. There is no convergence check — it always runs all 100 iterations regardless.
+
+- **Clamping during normalization distorts eigenvectors**: `normalize_vec()` clamps vector components to `±4×SCALE`. If the true eigenvector has a component that would exceed this, it gets truncated, shifting the direction of the computed eigenvector. This can happen when the matrix has large off-diagonal entries.
+
+- **Deflation accumulates error**: Each successive eigenvalue/eigenvector is computed by subtracting the previous components from the matrix (`mat -= λvvᵀ`). Since each `λ` and `v` has fixed-point error, the deflated matrix degrades — later components are increasingly inaccurate.
+
+- **Covariance computed from means in fixed-point**: `TernaryCovariance::from_data()` computes means via `fp_div(sum, n)`, which truncates toward zero. For datasets where `n` is not a power of 2, the mean estimate is biased, introducing systematic error into every covariance entry.
+
 ## Ecosystem
 
 Part of the **SuperInstance** ternary computing crate family:
