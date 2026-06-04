@@ -1,0 +1,6 @@
+[package]
+name = "ternary-pca"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Principal component analysis for ternary data with fixed-point arithmetic"
