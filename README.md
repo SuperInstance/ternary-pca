@@ -116,3 +116,12 @@ Part of the **SuperInstance** ternary computing crate family:
 ## License
 
 MIT
+
+## See Also
+- **ternary-matrix** — related
+- **ternary-projection** — related
+- **ternary-tensor** — related
+- **ternary-clustering** — related
+- **ternary-topology** — related
+- **ternary-entropy** — related
+
